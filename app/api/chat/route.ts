@@ -12,9 +12,14 @@ export const runtime = 'edge'
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
-  basePath: 'https://openrouter.ai/api/v1'
+  basePath: 'https://openrouter.ai/api/v1',
+  baseOptions: {
+    headers: {
+      'HTTP-Referer': 'https://vercel-ai-chatbot-delta.vercel.app',
+      'X-Title': 'Keigo App'
+    }
+  }
 })
-
 const openai = new OpenAIApi(configuration)
 
 export async function POST(req: Request) {
