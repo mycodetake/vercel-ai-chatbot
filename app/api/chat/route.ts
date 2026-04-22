@@ -11,7 +11,8 @@ import { nanoid } from '@/lib/utils'
 export const runtime = 'edge'
 
 const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY,
+  basePath: 'https://openrouter.ai/api/v1'
 })
 
 const openai = new OpenAIApi(configuration)
@@ -36,7 +37,7 @@ export async function POST(req: Request) {
   }
 
   const res = await openai.createChatCompletion({
-    model: 'gpt-3.5-turbo',
+    mmodel: 'openai/gpt-4o-mini',
     messages,
     temperature: 0.7,
     stream: true
