@@ -1,26 +1,12 @@
 import 'server-only'
 import { OpenAIStream, StreamingTextResponse } from 'ai'
-import { Configuration, OpenAIApi } from 'openai-edge'
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import { Database } from '@/lib/db_types'
-
 import { auth } from '@/auth'
 import { nanoid } from '@/lib/utils'
 
 export const runtime = 'edge'
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-  basePath: 'https://openrouter.ai/api/v1',
-  baseOptions: {
-    headers: {
-      'HTTP-Referer': 'https://vercel-ai-chatbot-delta.vercel.app',
-      'X-Title': 'Keigo App'
-    }
-  }
-})
-const openai = new OpenAIApi(configuration)
 
 export async function POST(req: Request) {
   const cookieStore = cookies()
@@ -32,20 +18,25 @@ export async function POST(req: Request) {
   const userId = (await auth({ cookieStore }))?.user.id
 
   if (!userId) {
-    return new Response('Unauthorized', {
-      status: 401
+    return new Response('Unauthorized', { status: 401 })
+  }
+
+  const apiKey = previewToken || process.env.OPENAI_API_KEY
+
+  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`,
+      'HTTP-Referer': 'https://vercel-ai-chatbot-delta.vercel.app',
+      'X-Title': 'Keigo App'
+    },
+    body: JSON.stringify({
+      model: 'openai/gpt-4o-mini',
+      messages,
+      temperature: 0.7,
+      stream: true
     })
-  }
-
-  if (previewToken) {
-    configuration.apiKey = previewToken
-  }
-
-  const res = await openai.createChatCompletion({
-    model: 'openai/gpt-4o-mini',
-    messages,
-    temperature: 0.7,
-    stream: true
   })
 
   const stream = OpenAIStream(res, {
@@ -68,7 +59,6 @@ export async function POST(req: Request) {
           }
         ]
       }
-      // Insert chat into database.
       await supabase.from('chats').upsert({ id, payload }).throwOnError()
     }
   })
