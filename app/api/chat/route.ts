@@ -24,7 +24,7 @@ function buildSystemPrompt(selectedScene: string, studyMode: boolean): string {
   const studyInstruction = studyMode
     ? `
 ---解説---
-（使用した敬語表現の説明を、ユーザーの入力言語で行う。箇条書きで簡潔に。）
+（ユーザーが入力した言語と同じ言語で説明する。中国語入力なら中国語で、英語入力なら英語で、日本語入力なら日本語で説明する。箇条書きで簡潔に。）
 
 ---読み方---
 （難しい漢字にふりがなを付ける　例：出席(しゅっせき)　会議(かいぎ)）`
