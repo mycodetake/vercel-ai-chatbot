@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       'X-Title': 'Keigo App'
     },
     body: JSON.stringify({
-      model: 'openrouter/auto',
+      model: 'openai/gpt-oss-120b:free',
       messages,
       temperature: 0.7,
       stream: true
