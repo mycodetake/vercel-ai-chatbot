@@ -1,7 +1,5 @@
 'use client'
-
 import { useChat, type Message } from 'ai/react'
-
 import { cn } from '@/lib/utils'
 import { ChatList } from '@/components/chat-list'
 import { ChatPanel } from '@/components/chat-panel'
@@ -22,6 +20,7 @@ import { Input } from './ui/input'
 import { toast } from 'react-hot-toast'
 
 const IS_PREVIEW = process.env.VERCEL_ENV === 'preview'
+
 export interface ChatProps extends React.ComponentProps<'div'> {
   initialMessages?: Message[]
   id?: string
@@ -34,13 +33,20 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
   )
   const [previewTokenDialog, setPreviewTokenDialog] = useState(IS_PREVIEW)
   const [previewTokenInput, setPreviewTokenInput] = useState(previewToken ?? '')
+
+  // 新增：场景和学習モード状态
+  const [selectedScene, setSelectedScene] = useState('general')
+  const [studyMode, setStudyMode] = useState(true)
+
   const { messages, append, reload, stop, isLoading, input, setInput } =
     useChat({
       initialMessages,
       id,
       body: {
         id,
-        previewToken
+        previewToken,
+        selectedScene,
+        studyMode
       },
       onResponse(response) {
         if (response.status === 401) {
@@ -48,6 +54,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         }
       }
     })
+
   return (
     <>
       <div className={cn('pb-[200px] pt-4 md:pt-10', className)}>
@@ -69,15 +76,18 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         messages={messages}
         input={input}
         setInput={setInput}
+        selectedScene={selectedScene}
+        setSelectedScene={setSelectedScene}
+        studyMode={studyMode}
+        setStudyMode={setStudyMode}
       />
-
       <Dialog open={previewTokenDialog} onOpenChange={setPreviewTokenDialog}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Enter your OpenAI Key</DialogTitle>
             <DialogDescription>
               If you have not obtained your OpenAI API key, you can do so by{' '}
-              <a
+              
                 href="https://platform.openai.com/signup/"
                 className="underline"
               >
