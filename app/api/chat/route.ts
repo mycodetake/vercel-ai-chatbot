@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       'X-Title': 'Keigo App'
     },
     body: JSON.stringify({
-      model: 'google/gemini-2.0-flash-exp:free',
+      model: 'openrouter/auto',
       messages,
       temperature: 0.7,
       stream: true
