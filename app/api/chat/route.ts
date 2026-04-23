@@ -103,7 +103,7 @@ export async function POST(req: Request) {
       'X-Title': 'Keigo App'
     },
     body: JSON.stringify({
-      model: 'google/gemma-3-12b-it:free',
+      model: 'openai/gpt-oss-120b:free',
       messages: [
         {
           role: 'system',
