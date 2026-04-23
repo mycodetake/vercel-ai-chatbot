@@ -87,7 +87,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
             <DialogTitle>Enter your OpenAI Key</DialogTitle>
             <DialogDescription>
               If you have not obtained your OpenAI API key, you can do so by{' '}
-              
+              <a              
                 href="https://platform.openai.com/signup/"
                 className="underline"
               >
