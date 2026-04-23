@@ -32,7 +32,7 @@ export async function POST(req: Request) {
       'X-Title': 'Keigo App'
     },
     body: JSON.stringify({
-      model: 'openai/gpt-4o-mini',
+      model: 'google/gemma-7b-it:free',
       messages,
       temperature: 0.7,
       stream: true
