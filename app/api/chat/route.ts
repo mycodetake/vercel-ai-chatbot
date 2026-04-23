@@ -85,6 +85,7 @@ export async function POST(req: Request) {
   })
   const json = await req.json()
   const { messages, previewToken, selectedScene, studyMode } = json
+  console.log('DEBUG:', { selectedScene, studyMode })
   const userId = (await auth({ cookieStore }))?.user.id
 
   if (!userId) {
