@@ -103,7 +103,7 @@ export async function POST(req: Request) {
       'X-Title': 'Keigo App'
     },
     body: JSON.stringify({
-      model: 'qwen/qwen3-next-80b-a3b-instruct:free',
+      model: 'google/gemma-3-12b-it:free',
       messages: [
         {
           role: 'system',
