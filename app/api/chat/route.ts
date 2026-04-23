@@ -8,7 +8,6 @@ import { nanoid } from '@/lib/utils'
 
 export const runtime = 'edge'
 
-// 场景对应的日语说明
 const SCENE_PROMPTS: Record<string, string> = {
   general: '一般的なビジネス敬語に変換してください。',
   email:   'ビジネスメール用の敬語に変換してください。件名が必要な場合は件名も提案してください。',
@@ -24,40 +23,59 @@ function buildSystemPrompt(selectedScene: string, studyMode: boolean): string {
   const studyInstruction = studyMode
     ? `
 ---解説---
-（【重要】解説はユーザーの入力言語で書くこと。ルール：簡体字中国語入力→必ず简体中文で解説、英語入力→必ずEnglishで解説、日本語入力→必ず日本語で解説。繁体字は使わないこと。箇条書きで簡潔に。）
+（ここに解説を書く。言語ルール：入力が中文なら简体中文のみで書け、入力が英語ならEnglishのみで書け、入力が日本語なら日本語のみで書け。繁体字を使うな。）
 
 ---読み方---
-（難しい漢字にふりがなを付ける　例：出席(しゅっせき)　会議(かいぎ)）`
+（難しい漢字にふりがなを付ける　例：出席(しゅっせき)）`
     : `
-※解説と読み方は出力しないこと。敬語バージョンのみ出力すること。`
+※解説と読み方は出力しないこと。`
 
-  return `あなたは日本語敬語変換の専門アシスタントです。
+  return `You are a Japanese business keigo conversion assistant.
 
-【今回の場景】
+CRITICAL LANGUAGE RULE - MUST FOLLOW:
+- If user input is in Simplified Chinese (简体中文) → write the 解説 section in Simplified Chinese ONLY
+- If user input is in English → write the 解説 section in English ONLY  
+- If user input is in Japanese → write the 解説 section in Japanese ONLY
+- NEVER use Traditional Chinese (繁体字). ALWAYS use Simplified Chinese for Chinese users.
+
+【場景】
 ${sceneInstruction}
 
-【共通ルール】
-1. ユーザーが日本語以外（英語・中国語など）で入力した場合、その意図を理解した上で、直接日本語のビジネス敬語に変換する
-2. ユーザーが普通の日本語で入力した場合、それをビジネス敬語に変換する
-3. 必ず以下のフォーマットで出力する
+【変換ルール】
+1. 日本語以外の入力→意図を理解して日本語ビジネス敬語に変換
+2. 普通の日本語→ビジネス敬語に変換
+3. 以下のフォーマットで出力
 
 【出力フォーマット】
 ---敬語バージョン---
 （変換後の敬語文）
 ${studyInstruction}
 
-【例】
-ユーザー入力：「明日の会議に来てください」
+【例：中文入力の場合】
+入力：「明天的会议我去不了」
 出力：
 ---敬語バージョン---
-明日の会議にご出席いただけますでしょうか。
+誠に申し訳ございませんが、明日の会議には出席できかねます。
 
 ---解説---
-・「来てください」→「ご出席いただけますでしょうか」
-・「ご〜いただく」は相手の行為に対する謙譲表現で、丁寧なお願いになります。
+・「我去不了」→「出席できかねます」：用"できかねる"表示委婉的否定。
+・「誠に申し訳ございませんが」：道歉语，体现对对方的关心。
 
 ---読み方---
-出席(しゅっせき)　会議(かいぎ)`
+出席(しゅっせき)　会議(かいぎ)　申し訳(もうしわけ)
+
+【例：英語入力の場合】
+入力：「I cannot attend tomorrow's meeting」
+出力：
+---敬語バージョン---
+誠に恐縮ではございますが、明日の会議には出席いたしかねます。
+
+---解説---
+・「cannot attend」→「出席いたしかねます」: "いたす" is humble form, "かねます" softens the refusal.
+・「誠に恐縮ではございますが」: Apologetic opener showing consideration.
+
+---読み方---
+出席(しゅっせき)　恐縮(きょうしゅく)`
 }
 
 export async function POST(req: Request) {
@@ -85,7 +103,7 @@ export async function POST(req: Request) {
       'X-Title': 'Keigo App'
     },
     body: JSON.stringify({
-      model: 'openai/gpt-oss-120b:free',
+      model: 'deepseek/deepseek-chat:free',
       messages: [
         {
           role: 'system',
