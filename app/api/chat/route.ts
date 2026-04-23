@@ -42,7 +42,7 @@ export async function POST(req: Request) {
   }
 
   const res = await openai.createChatCompletion({
-    mmodel: 'openai/gpt-4o-mini',
+    model: 'openai/gpt-4o-mini',
     messages,
     temperature: 0.7,
     stream: true
