@@ -16,7 +16,7 @@ const SCENES = [
 ]
 
 export interface ChatPanelProps
-  extends <Pick
+  extends Pick<
     UseChatHelpers,
     | 'append'
     | 'isLoading'
