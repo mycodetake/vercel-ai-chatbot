@@ -77,7 +77,16 @@ ${studyInstruction}
 ---読み方---
 出席(しゅっせき)　恐縮(きょうしゅく)`
 }
-
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Cookie, Authorization',
+    }
+  })
+}
 export async function POST(req: Request) {
   const cookieStore = cookies()
   const supabase = createRouteHandlerClient<Database>({
@@ -141,5 +150,10 @@ export async function POST(req: Request) {
     }
   })
 
-  return new StreamingTextResponse(stream)
+const headers = new Headers({
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Cookie, Authorization',
+})
+return new StreamingTextResponse(stream, { headers })
 }
