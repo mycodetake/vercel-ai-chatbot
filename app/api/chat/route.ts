@@ -124,7 +124,9 @@ if (!userId) {
   const apiKey = previewToken || process.env.OPENAI_API_KEY
   const systemPrompt = buildSystemPrompt(selectedScene ?? 'general', studyMode ?? true)
 
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+let res: Response | null = null
+for (let attempt = 1; attempt <= 3; attempt++) {
+  res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -135,16 +137,17 @@ if (!userId) {
     body: JSON.stringify({
       model: 'openai/gpt-oss-120b:free',
       messages: [
-        {
-          role: 'system',
-          content: systemPrompt
-        },
+        { role: 'system', content: systemPrompt },
         ...messages
       ],
       temperature: 0.7,
       stream: true
     })
   })
+  if (res.status !== 503) break
+  if (attempt < 3) await new Promise(r => setTimeout(r, 1000 * attempt))
+}
+if (!res) return new Response('Service unavailable', { status: 503 })
 
   const stream = OpenAIStream(res, {
     async onCompletion(completion) {
