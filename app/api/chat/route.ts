@@ -95,11 +95,31 @@ export async function POST(req: Request) {
   const json = await req.json()
   const { messages, previewToken, selectedScene, studyMode } = json
   console.log('DEBUG:', { selectedScene, studyMode })
-  const userId = (await auth({ cookieStore }))?.user.id
+let userId = (await auth({ cookieStore }))?.user.id
 
-  if (!userId) {
-    return new Response('Unauthorized', { status: 401 })
+// 如果Cookie认证失败，尝试Authorization header
+if (!userId) {
+  const authHeader = req.headers.get('Authorization')
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.slice(7)
+    try {
+      const supabaseResponse = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/user`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+        }
+      })
+      if (supabaseResponse.ok) {
+        const userData = await supabaseResponse.json()
+        userId = userData.id
+      }
+    } catch {}
   }
+}
+
+if (!userId) {
+  return new Response('Unauthorized', { status: 401 })
+}
 
   const apiKey = previewToken || process.env.OPENAI_API_KEY
   const systemPrompt = buildSystemPrompt(selectedScene ?? 'general', studyMode ?? true)
