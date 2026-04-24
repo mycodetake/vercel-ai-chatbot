@@ -135,7 +135,8 @@ for (let attempt = 1; attempt <= 3; attempt++) {
       'X-Title': 'Keigo App'
     },
     body: JSON.stringify({
-      model: 'openai/gpt-oss-120b:free',
+      //model: 'openai/gpt-oss-120b:free',
+      model: 'meta-llama/llama-3.3-70b-instruct',
       messages: [
         { role: 'system', content: systemPrompt },
         ...messages
